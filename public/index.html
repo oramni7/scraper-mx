@@ -10,6 +10,7 @@
   color: white;
   display: flex;
   justify-content: center;
+      overflow-y: auto;
 }
 
   html, body {
@@ -101,6 +102,34 @@ async function fetchData() {
 
 fetchData();
 setInterval(fetchData, 20000);
+
+    function autoScroll() {
+  const duration = 10000; // durée du scroll (10s)
+  const start = window.scrollY;
+  const end = document.body.scrollHeight - window.innerHeight;
+  const startTime = performance.now();
+
+  function scrollStep(currentTime) {
+    const progress = Math.min((currentTime - startTime) / duration, 1);
+    const ease = progress * (2 - progress); // easing smooth
+
+    window.scrollTo(0, start + (end - start) * ease);
+
+    if (progress < 1) {
+      requestAnimationFrame(scrollStep);
+    } else {
+      // Une fois en bas → retour direct en haut
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+      }, 1000);
+    }
+  }
+
+  requestAnimationFrame(scrollStep);
+}
+
+// lance toutes les 2 minutes
+setInterval(autoScroll, 120000);
   </script>
 </body>
 </html>
