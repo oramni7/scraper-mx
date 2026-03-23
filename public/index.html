@@ -7,12 +7,17 @@
     /* Style général de la page */
     body {
   font-family: Arial, sans-serif;
-  background: #0f0f0f;
   color: white;
   display: flex;
   justify-content: center;
 }
 
+  html, body {
+  background: transparent;
+  margin: 0;
+  padding: 0;
+}
+    
 .container {
   width: 350px;
   margin-top: 20px;
@@ -22,7 +27,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: linear-gradient(90deg, #1a1a1a, #111);
+  background: rgba(0, 0, 0, 0.6); /* semi transparent */
+  backdrop-filter: blur(4px);
   padding: 10px;
   margin-bottom: 6px;
   border-left: 4px solid #00ff88;
