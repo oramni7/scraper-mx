@@ -4,13 +4,87 @@
   <meta charset="UTF-8">
   <title>Classement Motocross</title>
   <style>
-    table { border-collapse: collapse; width: 50%; }
-    th, td { border: 1px solid #333; padding: 5px; text-align: center; }
-    th { background-color: #eee; }
+    /* Style général de la page */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f7f7f7;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    /* Tableau */
+    table {
+      border-collapse: collapse;
+      width: 90%;
+      max-width: 800px;
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 12px 15px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #007bff;
+      color: #fff;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    tbody tr:hover {
+      background-color: #dbe9ff;
+      transition: background-color 0.3s;
+    }
+
+    /* Responsive pour mobile */
+    @media (max-width: 600px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+      th {
+        text-align: left;
+      }
+      tr {
+        margin-bottom: 15px;
+        border-bottom: 2px solid #eee;
+      }
+      td {
+        text-align: right;
+        padding-left: 50%;
+        position: relative;
+      }
+      td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 15px;
+        width: 45%;
+        text-align: left;
+        font-weight: bold;
+        color: #555;
+      }
+    }
   </style>
 </head>
 <body>
   <h1>Classement Motocross</h1>
+
   <table id="classement">
     <thead>
       <tr>
@@ -24,33 +98,34 @@
   </table>
 
   <script>
-    const url = "https://scraper-mx-production.up.railway.app/data"; // Remplace par ton URL Railway
+    const url = "/data"; // ou ton URL Railway complet
 
     async function fetchData() {
       try {
         const res = await fetch(url);
+        if (!res.ok) throw new Error("Erreur fetch: " + res.status);
         const data = await res.json();
+
         const tbody = document.querySelector("#classement tbody");
-        tbody.innerHTML = ""; // vide l’ancien tableau
+        tbody.innerHTML = "";
 
         data.forEach(row => {
           const tr = document.createElement("tr");
           tr.innerHTML = `
-            <td>${row.pos}</td>
-            <td>${row.num}</td>
-            <td>${row.nom}</td>
-            <td>${row.ecart}</td>
+            <td data-label="Pos">${row.pos}</td>
+            <td data-label="Num">${row.num}</td>
+            <td data-label="Nom">${row.nom}</td>
+            <td data-label="Écart">${row.ecart}</td>
           `;
           tbody.appendChild(tr);
         });
       } catch (err) {
-        console.error("Erreur fetch :", err);
+        console.error(err);
       }
     }
 
-    // Récupère les données toutes les 20 secondes
-    fetchData();                  // première récupération
-    setInterval(fetchData, 20000); // ensuite toutes les 20s
+    fetchData();
+    setInterval(fetchData, 20000); // actualisation toutes les 20s
   </script>
 </body>
 </html>
