@@ -1,6 +1,5 @@
 const express = require("express");
-const axios = require("axios");
-const cheerio = require("cheerio");
+const puppeteer = require("puppeteer");
 const cors = require("cors");
 
 const app = express();
@@ -8,33 +7,33 @@ app.use(cors());
 
 const URL = "https://ligue-moto-centre.fr/motocross/";
 
-app.get("/data", async (req, res) => {
-  try {
-    const { data } = await axios.get(URL);
-    const $ = cheerio.load(data);
+app.get("/data", async(req, res) => {
+    try {
+        const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
+        const page = await browser.newPage();
+        await page.goto(URL, { waitUntil: 'networkidle2' });
 
-    const results = [];
+        const results = await page.evaluate(() => {
+            const rows = document.querySelectorAll("table.c1-0 tr");
+            const data = [];
+            rows.forEach(row => {
+                const tds = row.querySelectorAll("td");
+                if (tds.length >= 6) {
+                    const pos = tds[0].innerText.trim();
+                    const num = tds[1].innerText.trim();
+                    const nom = tds[2].innerText.trim();
+                    const ecart = tds[4].innerText.trim();
+                    if (pos && !isNaN(pos)) data.push({ pos, num, nom, ecart });
+                }
+            });
+            return data;
+        });
 
-    $("table.c1-0 tr").each((i, el) => {
-      const tds = $(el).find("td");
-      if (tds.length >= 7) {
-        const pos = $(tds[0]).text().trim();
-        const num = $(tds[1]).text().trim();
-        const nom = $(tds[2]).text().trim();
-        const ecart = $(tds[4]).text().trim(); // 5ème cellule, index 4
-
-        if (pos && !isNaN(pos)) {
-          results.push({ pos, num, nom, ecart });
-        }
-      }
-    });
-
-    res.json(results);
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Erreur scraping");
-  }
+        await browser.close();
+        res.json(results);
+    } catch (error) {
+        res.status(500).send("Erreur Puppeteer");
+    }
 });
 
 const PORT = process.env.PORT || 3000;
