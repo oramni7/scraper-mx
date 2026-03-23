@@ -15,16 +15,15 @@ app.get("/data", async (req, res) => {
 
     const results = [];
 
-    $("table tr").each((i, el) => {
+    $("table.c1-0 tr").each((i, el) => {
       const tds = $(el).find("td");
-
-      if (tds.length >= 4) {
+      if (tds.length >= 7) {
         const pos = $(tds[0]).text().trim();
         const num = $(tds[1]).text().trim();
         const nom = $(tds[2]).text().trim();
-        const ecart = $(tds[3]).text().trim();
+        const ecart = $(tds[4]).text().trim(); // 5ème cellule, index 4
 
-        if (!isNaN(pos)) {
+        if (pos && !isNaN(pos)) {
           results.push({ pos, num, nom, ecart });
         }
       }
@@ -33,9 +32,10 @@ app.get("/data", async (req, res) => {
     res.json(results);
 
   } catch (err) {
-    res.status(500).send("Erreur");
+    console.error(err);
+    res.status(500).send("Erreur scraping");
   }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT);
+app.listen(PORT, () => console.log("Server running"));
