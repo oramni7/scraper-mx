@@ -25,7 +25,8 @@ app.get("/data", async(req, res) => {
                     const num = tds[1].innerText.trim();
                     const nom = tds[2].innerText.trim();
                     const ecart = tds[4].innerText.trim();
-                    if (pos && !isNaN(pos)) data.push({ pos, num, nom, ecart });
+                    const Mtemps = tds[6].innerText.trim();
+                    if (pos && !isNaN(pos)) data.push({ pos, num, nom, ecart, Mtemps});
                 }
             });
             return data;
