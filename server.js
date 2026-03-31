@@ -35,8 +35,20 @@ app.get("/data", async(req, res) => {
         await browser.close();
         res.json(results);
     } catch (error) {
-        res.status(500).send("Erreur Puppeteer");
+    console.error("Erreur Puppeteer :", error.message);
+
+    // si erreur, on renvoie les dernières données connues
+    if (cache.length > 0) {
+      return res.json(cache);
     }
+
+    res.status(500).json({
+      error: "Erreur Puppeteer",
+      details: error.message
+    });
+  } finally {
+    isFetching = false;
+  }
 });
 
 const PORT = process.env.PORT || 3000;
